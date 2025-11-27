@@ -3,10 +3,9 @@ package com.tasktrackr.tasktrackr.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import com.tasktrackr.tasktrackr.model.status;
 
 @Entity
-public class task {
+public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +16,7 @@ public class task {
     private LocalDate dueDate;
 
     @Enumerated(EnumType.STRING)
-    private status status;
+    private Status status;
 
     public Long getId() {
         return id;
@@ -51,11 +50,11 @@ public class task {
         this.dueDate = dueDate;
     }
 
-    public status getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(status status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 }
