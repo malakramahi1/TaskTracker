@@ -1,82 +1,161 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <title>TaskTracker – Tasks</title>
-
-    <!-- Link to your CSS file in src/main/resources/static/css/styles.css -->
+    <title>TaskTracker — Tasks</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css">
 </head>
 <body>
+<div class="app-shell">
+    <header class="app-header">
+        <div>
+            <p class="eyebrow">TaskTracker</p>
+            <h1>Today</h1>
+        </div>
+        <div class="header-actions">
+            <button id="themeToggle" type="button" class="ghost-btn">🌞 / 🌙</button>
+            <button id="newTaskBtn" type="button" class="pill-btn">+ New Task</button>
+        </div>
+    </header>
 
-<header>
-    <h1>TaskTracker – Tasks</h1>
-</header>
+    <section class="filters">
+        <form method="get" action="/tasks" class="filter-form">
+            <div class="filter-field">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="">Any</option>
+                    <option value="TODO">To Do</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="DONE">Done</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="pill-btn small">Filter</button>
+                <a class="ghost-btn small" href="/tasks">Clear</a>
+            </div>
+        </form>
+    </section>
 
-<!-- Filters section -->
-<section class="filters">
-    <form method="get" action="/tasks">
-        <label>
-            Assignee:
-            <input type="text" name="assignee" placeholder="Search by name">
-        </label>
+    <section class="task-list">
+        <div class="task-row header-row">
+            <div class="col dot"></div>
+            <div class="col title">Title</div>
+            <div class="col desc">Description</div>
+            <div class="col due">Due</div>
+            <div class="col status">Status</div>
+            <div class="col actions">Actions</div>
+        </div>
 
-        <label>
-            Status:
-            <select name="status">
-                <option value="">Any</option>
-                <option value="TODO">To-Do</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="DONE">Done</option>
-            </select>
-        </label>
-
-        <button type="submit">Filter</button>
-        <a href="/tasks"><button type="button">Clear</button></a>
-    </form>
-</section>
-
-<!-- New task button -->
-<section class="actions">
-    <a th:href="@{/tasks/new}">
-        <button type="button">+ New Task</button>
-    </a>
-</section>
-
-<!-- Tasks table -->
-<section class="task-table">
-    <table>
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Due Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="task : ${tasks}">
-            <td th:text="${task.title}">Title</td>
-            <td th:text="${task.description}">Description</td>
-            <td th:text="${task.dueDate}">2025-01-01</td>
-            <td th:text="${task.status}">TODO</td>
-            <td>
-                <a th:href="@{/tasks/{id}/edit(id=${task.id})}">Edit</a>
-                |
-                <form th:action="@{/tasks/{id}/delete(id=${task.id})}"
-                      method="post"
-                      style="display:inline">
-                    <button type="submit"
-                            onclick="return confirm('Delete this task?');">
-                        Delete
-                    </button>
+        <div th:each="task : ${tasks}" class="task-row">
+            <div class="col dot"><span class="circle"></span></div>
+            <div class="col title">
+                <div class="primary" th:text="${task.title}">Title</div>
+            </div>
+            <div class="col desc">
+                <div class="secondary" th:text="${task.description}">Description</div>
+            </div>
+            <div class="col due">
+                <span class="due-date" th:text="${task.dueDate}">2025-01-01</span>
+            </div>
+            <div class="col status">
+                <span class="status-chip" th:text="${task.status}">TODO</span>
+            </div>
+            <div class="col actions">
+                <button type="button"
+                        class="ghost-btn small"
+                        th:attr="data-id=${task.id},
+                                 data-title=${task.title},
+                                 data-description=${task.description},
+                                 data-duedate=${task.dueDate},
+                                 data-status=${task.status}"
+                        onclick="startEdit(this)">
+                    Edit
+                </button>
+                <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post" onsubmit="return confirm('Delete this task?');">
+                    <button type="submit" class="pill-btn small danger">Delete</button>
                 </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</section>
+            </div>
+        </div>
 
+        <div id="inlineForm" class="task-row inline-form hidden">
+            <div class="col dot"><span class="circle filled"></span></div>
+            <form id="taskForm" method="post" class="form-inline" th:action="@{/tasks}">
+                <input type="hidden" id="editingId" value="">
+                <div class="col title">
+                    <input id="title" name="title" type="text" placeholder="Task title" required>
+                </div>
+                <div class="col desc">
+                    <input id="description" name="description" type="text" placeholder="Description">
+                </div>
+                <div class="col due">
+                    <input id="dueDate" name="dueDate" type="date" required>
+                </div>
+                <div class="col status">
+                    <select id="statusSelect" name="status">
+                        <option value="TODO">To Do</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="DONE">Done</option>
+                    </select>
+                </div>
+                <div class="col actions inline-actions">
+                    <button id="saveBtn" type="submit" class="pill-btn small">Save</button>
+                    <button id="cancelBtn" type="button" class="ghost-btn small" onclick="resetForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+
+<script>
+    const root = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const inlineForm = document.getElementById('inlineForm');
+    const newTaskBtn = document.getElementById('newTaskBtn');
+    const taskForm = document.getElementById('taskForm');
+    const editingIdField = document.getElementById('editingId');
+    const saveBtn = document.getElementById('saveBtn');
+
+    function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        localStorage.setItem('tt-theme', theme);
+    }
+
+    function resetForm() {
+        taskForm.reset();
+        editingIdField.value = '';
+        taskForm.setAttribute('action', '/tasks');
+        saveBtn.textContent = 'Save';
+        inlineForm.classList.add('hidden');
+    }
+
+    function startEdit(btn) {
+        const { id, title, description, duedate, status } = btn.dataset;
+        editingIdField.value = id;
+        document.getElementById('title').value = title || '';
+        document.getElementById('description').value = description || '';
+        document.getElementById('dueDate').value = duedate || '';
+        document.getElementById('statusSelect').value = status || 'TODO';
+        taskForm.setAttribute('action', `/tasks/${id}/edit`);
+        saveBtn.textContent = 'Update';
+        inlineForm.classList.remove('hidden');
+        inlineForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    themeToggle?.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme') || 'light';
+        applyTheme(current === 'light' ? 'dark' : 'light');
+    });
+
+    newTaskBtn?.addEventListener('click', () => {
+        resetForm();
+        inlineForm.classList.remove('hidden');
+        inlineForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    (function initTheme() {
+        const stored = localStorage.getItem('tt-theme');
+        if (stored) applyTheme(stored);
+    })();
+</script>
 </body>
 </html>
