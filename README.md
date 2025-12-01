@@ -6,9 +6,8 @@ This document describes the final state of our TaskTracker project for the CS 48
 
 ## 1. Demo Video Link
 
-A 3–4 minute screen recording demonstrating TaskTracker in action:
 
-> **Video link:** 
+> **Video link: https://youtu.be/hf3Zq6UORI0** 
 
 The demo shows how to:
 - View the main task list page
