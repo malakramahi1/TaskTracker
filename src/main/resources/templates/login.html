@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - TaskTrackr</title>
+</head>
+<body>
+<h1>Login</h1>
+
+<div th:if="${loginError}" style="color:red;" th:text="${loginError}"></div>
+
+<form th:action="@{/login}" method="post">
+    <div>
+        <label for="usernameOrEmail">Username or Email:</label><br>
+        <input id="usernameOrEmail" name="usernameOrEmail" type="text" required>
+    </div>
+
+    <div>
+        <label for="password">Password:</label><br>
+        <input id="password" name="password" type="password" required>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <button type="submit">Login</button>
+    </div>
+</form>
+
+<p style="margin-top: 15px;">
+    No account yet?
+    <a th:href="@{/signup}">Sign up</a>
+</p>
+</body>
+</html>

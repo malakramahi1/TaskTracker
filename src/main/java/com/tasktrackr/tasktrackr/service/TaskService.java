@@ -3,6 +3,7 @@ package com.tasktrackr.tasktrackr.service;
 import com.tasktrackr.tasktrackr.model.Status;
 import com.tasktrackr.tasktrackr.model.Task;
 import com.tasktrackr.tasktrackr.repository.TaskRepository;
+import com.tasktrackr.tasktrackr.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,9 @@ public class TaskService {
 
     @Autowired
     private TaskRepository repo;
+
+    @Autowired
+    private UserRepository userRepo;
 
     public List<Task> getAll() {
         return repo.findAll();
@@ -34,5 +38,13 @@ public class TaskService {
 
     public void save(Task task) {
         repo.save(task);
+    }
+
+    public List<Task> getByUser(Integer userId) {
+        return repo.findByAssignee_userId(userId);
+    }
+
+    public List<Task> getByUserAndStatus(Integer userId, Status status) {
+        return repo.findByAssignee_userIdAndStatus(userId, status);
     }
 }

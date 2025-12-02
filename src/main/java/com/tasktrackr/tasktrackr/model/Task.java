@@ -5,18 +5,38 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "task")
 public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "task_id")
     private Long id;
 
+    @Column(length = 20, nullable = false)
     private String title;
+
+    @Column(length = 100)
     private String description;
+
+    @Column(name = "due_date")
     private LocalDate dueDate;
 
+    @ManyToOne
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20)
     private Status status;
+
+    public User getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(User assignee) {
+        this.assignee = assignee;
+    }
 
     public Long getId() {
         return id;
