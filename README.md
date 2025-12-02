@@ -1,82 +1,70 @@
-# TaskTracker — Requirement Analysis (Due Nov 18)
+# TaskTracker — Final Project Deliverable (Dec 1)
 
-This document outlines the requirement analysis, application needs, data structure, and technology stack for our TaskTracker project. TaskTracker is a lightweight system designed to help teams create, assign, and track tasks with clear status indicators and due dates. The ER diagram is included at the end.
-
----
-
-## 1. Overview
-
-TaskTracker is a simple web application that allows users to manage personal or group tasks in an organized and efficient way. Users can create tasks, assign them to team members, define due dates, and update the task’s status as work progresses. The purpose of the system is to provide a clear overview of what needs to be done, who is responsible for each task, and which tasks are overdue. The application follows a standard client–server design: a Flask backend handles requests and database operations, while a clean HTML/CSS/JavaScript frontend displays all information to the user.
+This document describes the final state of our TaskTracker project for the CS 480 course. It includes a link to our demo recording, the final ER diagram, and the relational schema used by our implementation. The earlier requirement analysis for the Nov 18 deliverable is included at the end as an appendix.
 
 ---
 
-## 2. Data Requirements
+## 1. Demo Video Link
 
-TaskTracker requires storing information about users, tasks, and task statuses. The following data entities and attributes are needed:
 
-### **Entities & Attributes**
-- **User**
-  - `user_id` (Primary Key)
-  - `name`
-  - `email` (unique)
-  - `password_hash`
-  - `created_at`
+> **Video link: https://youtu.be/hf3Zq6UORI0** 
 
-- **Status**
-  - `status_id` (Primary Key)
-  - `status_name` (e.g., “To-Do”, “In Progress”, “Done”)
-
-- **Task**
-  - `task_id` (Primary Key)
-  - `title`
-  - `description`
-  - `due_date`
-  - `status_id` (Foreign Key → Status)
-  - `assignee_id` (Foreign Key → User)
-  - `created_at`
-
-### **Relationships**
-- A **User** can be assigned multiple **Tasks** (one-to-many)
-- A **Status** type can apply to multiple **Tasks** (one-to-many)
-
-These relationships ensure that every task has exactly one assigned user and one status category.
+The demo shows how to:
+- View the main task list page
+- Create a new task (title, description, due date, status)
+- Filter tasks by status (Any / To Do / In Progress / Done)
+- Update or delete an existing task
 
 ---
 
-## 3. Application Requirements
+## 2. Final ER Diagram
 
-### **Functional Requirements**
-- Users can create a new task by entering a title, description, assignee, due date, and status.
-- Users can edit existing tasks or delete them.
-- Users can update a task’s completion status (e.g., move from To-Do → In Progress → Done).
-- The system displays all tasks in a list or table view.
-- Users can filter tasks by assignee or status.
-- The system highlights or marks overdue tasks based on `due_date`.
+Our final ER diagram has three entities: **User**, **Task**, and **Status**.
 
-### **Non-Functional Requirements**
-- Pages should load within approximately 2 seconds under normal usage.
-- The interface should be easy to navigate and intuitive for first-time users.
-- Should work in all modern desktop browsers (Chrome, Safari, Firefox, Edge).
-- All data must be stored persistently in a MySQL database.
-- The backend should follow clean MVC-style organization for clarity and maintainability.
+![alt text](er_diagram.png)
 
----
+- Each **User** can be assigned many **Tasks**.
+- Each **Status** value (To Do, In Progress, Done) can be used by many **Tasks**.
+- Each **Task** references exactly one **User** (its assignee) and one **Status**.
 
-## 4. Web Technologies
 
-TaskTracker will be built using the following tools and technologies:
 
-- **Backend:** Spring Boot, Maven
-- **Frontend:** HTML, CSS, JavaScript  
-- **Database:** MySQL  
-- **Version Control:** Git + GitHub  
-- **Development Tools:** VS Code or PyCharm, Lucidchart for ER diagram  
-- **Optional Deployment:** Render, Fly.io, or a local Flask server  
+**Key relationships:**
 
-These technologies ensure the project remains lightweight, easy to maintain, and simple for multiple teammates to work on simultaneously.
+- `Task.Assignee_ID` → `User.User_ID` (who the task is assigned to)  
+- `Task.Status_ID` → `Status.Status_ID` (current status of the task)
+
+This matches the way TaskTracker behaves: every task has an owner and a status, and the UI allows filtering by status.
 
 ---
 
-## 5. ER Diagram
+## 3. Relational Schema
 
-![ERD Diagram](gp_requirement_v1.png)
+The relational schema corresponding to the ER diagram is:
+
+```text
+User(
+    User_ID       INT PRIMARY KEY,
+    username      VARCHAR(20) NOT NULL,
+    password_hash VARCHAR(20) NOT NULL,
+    email         VARCHAR(50) NOT NULL UNIQUE,
+    Name          VARCHAR(20) NOT NULL,
+    created_at    DATE NOT NULL
+)
+
+Status(
+    Status_ID INT PRIMARY KEY,
+    Name      VARCHAR(20) NOT NULL
+)
+
+Task(
+    Task_ID     INT PRIMARY KEY,
+    Assignee_ID INT NOT NULL,
+    Title       VARCHAR(20) NOT NULL,
+    Description VARCHAR(100),
+    Due_date    DATE,
+    Status_ID   INT NOT NULL,
+    Created_at  DATE NOT NULL,
+    FOREIGN KEY (Assignee_ID) REFERENCES User(User_ID),
+    FOREIGN KEY (Status_ID)   REFERENCES Status(Status_ID)
+)
