@@ -1,43 +1,69 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Sign Up - TaskTrackr</title>
+    <meta charset="UTF-8">
+    <title>Sign Up – TaskTrackr</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
 </head>
-<body>
-<h1>Sign Up</h1>
 
-<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+<body class="auth-body">
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-title">Create Account</div>
+        <div class="auth-subtitle">Set up your TaskTrackr account to start tracking tasks.</div>
 
-<form th:action="@{/signup}" method="post">
-  <div>
-    <label for="username">Username:</label><br>
-    <input id="username" name="username" type="text" required maxlength="20">
-  </div>
+        <!-- shows error from backend (duplicate username, etc.) -->
+        <div th:if="${error}" class="auth-error" th:text="${error}"></div>
 
-  <div>
-    <label for="email">Email:</label><br>
-    <input id="email" name="email" type="email" required maxlength="50">
-  </div>
+        <!-- IMPORTANT: matches AuthController.showSignupForm + doSignup -->
+        <!-- We keep the simple names so form.getUsername(), form.getEmail(), etc. still work -->
+        <form th:action="@{/signup}" method="post" th:object="${userForm}">
+            <div class="auth-field">
+                <label class="auth-label" for="username">Username</label>
+                <input class="auth-input"
+                       id="username"
+                       th:field="*{username}"
+                       type="text"
+                       required
+                       maxlength="20">
+            </div>
 
-  <div>
-    <label for="name">Display Name:</label><br>
-    <input id="name" name="name" type="text" maxlength="20">
-  </div>
+            <div class="auth-field">
+                <label class="auth-label" for="email">Email</label>
+                <input class="auth-input"
+                       id="email"
+                       th:field="*{email}"
+                       type="email"
+                       required
+                       maxlength="50">
+            </div>
 
-  <div>
-    <label for="password">Password:</label><br>
-    <input id="password" name="password" type="password" required>
-  </div>
+            <div class="auth-field">
+                <label class="auth-label" for="name">Display Name</label>
+                <input class="auth-input"
+                       id="name"
+                       th:field="*{name}"
+                       type="text"
+                       maxlength="20">
+            </div>
 
-  <div style="margin-top: 10px;">
-    <button type="submit">Create Account</button>
-  </div>
-</form>
+            <div class="auth-field">
+                <label class="auth-label" for="password">Password</label>
+                <input class="auth-input"
+                       id="password"
+                       th:field="*{password}"
+                       type="password"
+                       required>
+            </div>
 
-<p style="margin-top: 15px;">
-  Already have an account?
-  <a th:href="@{/login}">Login here</a>
-</p>
+            <button class="auth-btn-primary" type="submit">Create Account</button>
+        </form>
+
+        <div class="auth-footer-text">
+            Already have an account?
+            <a class="auth-link" th:href="@{/login}">Log in instead</a>
+        </div>
+    </div>
+</div>
 </body>
 </html>
